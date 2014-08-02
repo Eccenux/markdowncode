@@ -1,4 +1,4 @@
-name = Markdown Github style code filter
+name = Github-style Markdown code blocks filter
 description = Allows using Github style for adding code blocks. Note! You will need a Geshi filter AFTER this filter.
 package = "Input filters"
 core = 7.x
