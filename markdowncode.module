@@ -12,7 +12,8 @@ function markdowncode_filter_info() {
 	$filters = array(
 		'filter_markdowncode' => array(
 			'title' => t('Github-style Markdown code blocks'),
-			'description' => t('Allows using Gihub style fenced code blocks with language name.'),
+			'description' => t('Allows using Gihub style fenced code blocks with language name. 
+				Note! You must add Geshi filter AFTER this filter.'),
 			'process callback' => '_filter_markdowncode_process',
 			'tips callback'	=> '_filter_markdowncode_tips',
 		)
@@ -33,16 +34,12 @@ function _filter_markdowncode_tips($format, $long = FALSE) {
 }
 ```
 		';
-		$exampleRender = htmlspecialchars(_filter_markdowncode_process($example, null, null));
+		//$exampleRender = _filter_markdowncode_process($example, null, null);
 		return t('You can use fenced code blocks used in Github-style Markdown. 
 			<p>Example:
 			<pre>@example</pre>
-			<p>Is transformed to:
-			<pre>@example_render</pre>
-			<p>As you can see the filter itself will NOT enable syntax highlighting, 
-			but e.g. Geshi filter will pick up the `pre` tag and transform it further.
 			',
-			array('@example' => $example, '@example_render' => $exampleRender)
+			array('@example' => $example)
 		);
 	}
 	else {
