@@ -1,7 +1,9 @@
-markdowncode
+MarkdownCode
 ============
 
-This is a simple Drupal 7 filter that allows using Github style for adding code blocks.
+This is a simple Drupal 7 filter that allows using fenced code blocks with language name. Just as you can in Github-style Markdown.
+
+As a bouns you can use 4-space code blocks. This is done after fenced code blocks so you can provide examples of fenced code blocks in 4-space code blocks ;-). In case its not obvious - 4-space code blocks consists of lines that start with 4 spaces.
 
 Example
 ----------

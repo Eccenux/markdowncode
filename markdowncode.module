@@ -75,7 +75,7 @@ function _markdowncode_prepare($text) {
 		// fenced blocks
 		$text = preg_replace('#([\r\n])```([a-z]\S+)([\s\S]+?[\r\n])```#', '$1<pre language="$2">$3</pre>', $text);
 		// 4-space code block
-		$text = preg_replace_callback('#([\r\n]+    .+)+#', '_markdowncode_space_code_block_match_process', $text);
+		$text = preg_replace_callback('#([\r\n]+    .*)+#', '_markdowncode_space_code_block_match_process', $text);
 	}
 
 	return $text;
