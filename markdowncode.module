@@ -16,8 +16,8 @@ function markdowncode_filter_info() {
 			'title' => t('Github-style Markdown code blocks'),
 			'description' => t('Allows using Gihub style fenced code blocks with language name. 
 				Note! You must add Geshi filter AFTER this filter.'),
-			'prepare callback' => '_filter_markdowncode_prepare',
-			'tips callback'	=> '_filter_markdowncode_tips',
+			'prepare callback' => '_markdowncode_prepare',
+			'tips callback'	=> '_markdowncode_tips',
 		)
 	);
 
@@ -29,7 +29,7 @@ function markdowncode_filter_info() {
  * 
  * @implements callback_filter_tips($filter, $format, $long)
  */
-function _filter_markdowncode_tips($format, $format, $long = FALSE) {
+function _markdowncode_tips($format, $format, $long = FALSE) {
 	$example = '```css
 .some-class {
 background: yellow;
@@ -55,15 +55,27 @@ background: yellow;
 }
 
 /**
+ * Removes spaces in 4-space code block.
+ */
+function _markdowncode_space_code_block_match_process($matches)
+{
+	echo $matches[0];
+	return "\n<pre>".preg_replace('#([\r\n])    #', '$1', $matches[0])."</pre>";
+}
+
+/**
  * The filter.
  * 
  * @note The process is done in prepare phase because GeSHi would not pick it up otherwise.
  * 
  * @implements callback_filter_prepare($text, $filter, $format, $langcode, $cache, $cache_id)
  */
-function _filter_markdowncode_prepare($text) {
+function _markdowncode_prepare($text) {
 	if (!empty($text)) {
-		$text = preg_replace('#```([a-z]\S+)([\s\S]+?)```#', '<pre language="$1">$2</pre>', $text);
+		// fenced blocks
+		$text = preg_replace('#([\r\n])```([a-z]\S+)([\s\S]+?[\r\n])```#', '$1<pre language="$2">$3</pre>', $text);
+		// 4-space code block
+		$text = preg_replace_callback('#([\r\n]+    .+)+#', '_markdowncode_space_code_block_match_process', $text);
 	}
 
 	return $text;
