@@ -59,8 +59,24 @@ background: yellow;
  */
 function _markdowncode_space_code_block_match_process($matches)
 {
-	echo $matches[0];
-	return "\n<pre>".preg_replace('#([\r\n])    #', '$1', $matches[0])."</pre>";
+	$content = trim($matches[0]);
+	return "\n<pre>".preg_replace('#([\r\n])    #', '$1', $content)."</pre>\n\n";
+}
+
+$_markdowncode_pre_match_process_saved = array();
+
+function _markdowncode_pre_save_match_process($matches)
+{
+	global $_markdowncode_pre_match_process_saved;
+	$id = count($_markdowncode_pre_match_process_saved);
+	$_markdowncode_pre_match_process_saved[] = $matches[0];
+	return "<pre@@@$id/>";
+}
+function _markdowncode_pre_restore_match_process($matches)
+{
+	global $_markdowncode_pre_match_process_saved;
+	$id = intval($matches[1]);
+	return $_markdowncode_pre_match_process_saved[$id];
 }
 
 /**
@@ -72,10 +88,19 @@ function _markdowncode_space_code_block_match_process($matches)
  */
 function _markdowncode_prepare($text) {
 	if (!empty($text)) {
+		// normalize new lines
+		$text = strtr($text, array(
+			"\r\n" => "\n",
+			"\r" => "\n",
+		));
+		// escape pre tags contents
+		$text = preg_replace_callback('#<pre[^>]*>[\s\S]+?</pre>#', '_markdowncode_pre_save_match_process', $text);
 		// fenced blocks
-		$text = preg_replace('#([\r\n])```([a-z]\S+)([\s\S]+?[\r\n])```#', '$1<pre language="$2">$3</pre>', $text);
+		$text = preg_replace('#(\n)```([a-z]\S+)([\s\S]+?\n)```#', '$1<pre language="$2">$3</pre>', $text);
 		// 4-space code block
-		$text = preg_replace_callback('#([\r\n]+    .*)+#', '_markdowncode_space_code_block_match_process', $text);
+		$text = preg_replace_callback('#\n(\n+    .*)+\n\n#', '_markdowncode_space_code_block_match_process', $text);
+		// restore pre tags contents
+		$text = preg_replace_callback('#<pre@@@([0-9]+)/>#', '_markdowncode_pre_restore_match_process', $text);
 	}
 
 	return $text;
